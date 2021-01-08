@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/functions": "^1.1.2"
+    "@google-cloud/functions": "^1.1.2",
+    "mysql": "^2.18.1"
   }
 }
