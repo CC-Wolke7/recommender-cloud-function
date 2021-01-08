@@ -1,20 +1,3 @@
-/**
- * Background Cloud Function to be triggered by Pub/Sub.
- * This function is exported by index.js, and executed when
- * the trigger topic receives a message.
- *
- * @param _ignored
- * @param {object} data The event payload.
- *
- * Test in prod later:
-    gcloud pubsub topics create MY_TOPIC # Create a Pub/Sub topic
-    gcloud functions deploy MY_FUNCTION \
-      --trigger-topic MY_TOPIC \
-      --runtime nodejs10
-
-    gcloud pubsub topics publish MY_TOPIC --message '{ "race": "golden_retriever" }'
-**/
-
 var mysql = require('mysql');
 
 exports.recommend = (_ignored, data) => {
@@ -27,8 +10,6 @@ exports.recommend = (_ignored, data) => {
   if (race === NULL) throw Error('No race provided.');
 
   const sql_query = `SELECT user_list FROM race_user_list WHERE race = "${race}"`;
-
-  // in mysql, do: "CREATE VIEW `race_user_list` AS SELECT race, GROUP_CONCAT(user_id) FROM subscription GROUP BY race"
 
   // connect to db
   var con = mysql.createConnection({
