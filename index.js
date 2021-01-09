@@ -1,4 +1,12 @@
-var mysql = require('mysql');
+const mysql = require('mysql');
+const axios = require('axios');
+const http = require('http');
+const mockserver = require('mockserver');
+
+const BOT_ID = 999;
+const baseURL = 'http://localhost:9001';
+
+http.createServer(mockserver('_mocks/')).listen(9001);
 
 exports.recommend = (_ignored, data) => {
   const msg = data.message;
@@ -7,7 +15,6 @@ exports.recommend = (_ignored, data) => {
 
   // else:
   const race = msg.race;
-  if (race === NULL) throw Error('No race provided.');
 
   const sql_query = `SELECT user_list FROM race_user_list WHERE race = "${race}"`;
 
@@ -26,11 +33,34 @@ exports.recommend = (_ignored, data) => {
       if (err) throw err;
 
       const user_list = JSON.parse("[" + result[0].user_list + "]");
-      // console.log(user_list);
+      console.log('Sending messages to users ' + user_list);
 
-      // TODO send a message to all user_ids in user_list ..
+      user_list.forEach((user_id) => {
+        const chatID = BOT_ID + ',' + user_id;
 
+        axios.get(baseURL + '/chats/?participants=' + chatID)
+          .then(function (response) {
+            // TODO header Authorization: Bearer <serviceToken>
+            axios.post(baseURL + '/chats/:' + chatID + '/messages/', {message: 'See this cute new ' + race})
+              .then(function (response) {
+                console.log('Message has been sent to user ' + user_id);
+            }).catch(function (error) {
+                console.log(error);
+            });
+          })
+          .catch(function (error) {
+            if (error.response.status === 404){
+              console.log('No chat has been found for chatID ' + chatID + '. Will now instantiate chat');
+              // TODO POST /chats/
+              /*
+              axios.post(baseURL + '/chats/?participants=' + chatID)
+                  .then(function (response) {
+                    console.log(response);
+                  })
+               */
+            }
+        });
+      });
+    });
   });
-});
-
 };

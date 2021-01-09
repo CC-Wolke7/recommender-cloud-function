@@ -11,6 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/functions": "^1.1.2",
+    "axios": "^0.21.1",
+    "https": "^1.0.0",
+    "mockserver": "^3.1.1",
     "mysql": "^2.18.1"
   }
 }
