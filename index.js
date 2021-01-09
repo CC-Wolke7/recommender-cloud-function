@@ -15,11 +15,10 @@ exports.recommend = (_ignored, data) => {
 
   // else:
   const race = msg.race;
-
   const sql_query = `SELECT user_list FROM race_user_list WHERE race = "${race}"`;
 
   // connect to db
-  var con = mysql.createConnection({
+  const con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "rootybooty",
@@ -35,9 +34,11 @@ exports.recommend = (_ignored, data) => {
       const user_list = JSON.parse("[" + result[0].user_list + "]");
       console.log('Sending messages to users ' + user_list);
 
+      // send message to each user in user list
       user_list.forEach((user_id) => {
         const chatID = BOT_ID + ',' + user_id;
 
+        // if bot and user have chatted before, just send message
         axios.get(baseURL + '/chats/?participants=' + chatID)
           .then(function (response) {
             // TODO header Authorization: Bearer <serviceToken>
@@ -48,16 +49,16 @@ exports.recommend = (_ignored, data) => {
                 console.log(error);
             });
           })
+            // if they have never chatted before (chat is not found), send post request to /chats/
           .catch(function (error) {
             if (error.response.status === 404){
               console.log('No chat has been found for chatID ' + chatID + '. Will now instantiate chat');
-              // TODO POST /chats/
-              /*
-              axios.post(baseURL + '/chats/?participants=' + chatID)
+              axios.post(baseURL + '/chats/', {participants: chatID})
                   .then(function (response) {
                     console.log(response);
-                  })
-               */
+                  }).catch(function (error) {
+                    console.log(error);
+              });
             }
         });
       });

@@ -2,5 +2,5 @@ HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 
 {
-   "Ok": "Test"
+   "Post": "Message to 999,3"
 }
