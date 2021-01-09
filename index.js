@@ -55,7 +55,7 @@ exports.recommend = (_ignored, data) => {
               console.log('No chat has been found for chatID ' + chatID + '. Will now instantiate chat');
               axios.post(baseURL + '/chats/', {participants: chatID})
                   .then(function (response) {
-                    console.log(response);
+                    console.log('Message has been sent to user ' + user_id);
                   }).catch(function (error) {
                     console.log(error);
               });

@@ -2,6 +2,5 @@
   "message": {
     "race": "golden_retriever",
     "messageId": "1"
-  },
-  "subscription": "projects/myproject/subscriptions/mysubscription"
+  }
 }
