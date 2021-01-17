@@ -13,7 +13,6 @@
     "@google-cloud/functions": "^1.1.2",
     "axios": "^0.21.1",
     "https": "^1.0.0",
-    "mockserver": "^3.1.1",
     "mysql": "^2.18.1",
     "qs": "^6.9.6",
     "tslint": "^6.1.3"
