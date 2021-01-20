@@ -6,17 +6,6 @@ const BOT_UUID = '7c8a6ec3-fc0f-4e0f-95ac-e25f3500c157'
 const BOT_SERVICE_TOKEN = 'NTZiYWU4YjE1ZmQyYzdlMGViZDI1Y2EzODMzZTUxZjQK'
 const baseURL = 'http://localhost:3000';
 
-function logError(error) {
-    console.error("Error response:");
-    console.error(error.response.data);
-    console.error(error.response.status);
-    console.error(error.response.headers);
-}
-
-
-async function example(participants){
-    return await axios.post(baseURL + '/chats/', {participants: participants}, {headers: {Authorization: 'Bearer ' + BOT_SERVICE_TOKEN}});
-}
 
 exports.recommend = (_ignored, data) => {
     const msg = data.message;
