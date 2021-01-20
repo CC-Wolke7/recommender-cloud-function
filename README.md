@@ -1,6 +1,6 @@
 ### Test locally
 - Create the MySQL DB using the `database/testdump.sql`
-- Change connection infos (host/user/pw) in `index.js`
+- Change connection infos (host/user/pw) in `index.ts`
 - Open three terminals and call
     - `gcloud beta emulators pubsub start` for starting the pubsub emulator
     - `npm start` to start the recommend function (using the google-cloud/functions-framework)
