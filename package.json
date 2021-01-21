@@ -1,25 +1,25 @@
 {
-  "name": "node",
+  "name": "recommender-cloud-function",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "author": "Savina Diez",
+  "license": "UNLICENSED",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx @google-cloud/functions-framework --target=recommend --signature-type=event"
+    "build": "tsc -p tsconfig.json",
+    "start": "functions-framework --source=build/ --target=recommend --signature-type=event",
+    "watch": "concurrently \"tsc -p tsconfig.json -w\" \"nodemon --watch ./build/ --exec npm run start\""
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "@google-cloud/functions": "^1.1.2",
+    "@google-cloud/functions-framework": "^1.7.1",
     "axios": "^0.21.1",
-    "https": "^1.0.0",
     "mysql": "^2.18.1",
-    "qs": "^6.9.6",
-    "tslint": "^6.1.3"
+    "qs": "^6.9.6"
   },
   "devDependencies": {
+    "@types/express": "^4.17.11",
     "@types/mysql": "^2.15.17",
     "@types/qs": "^6.9.5",
+    "concurrently": "^5.3.0",
+    "nodemon": "^2.0.7",
     "typescript": "^4.1.3"
   }
 }

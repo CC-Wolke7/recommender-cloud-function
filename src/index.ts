@@ -27,7 +27,7 @@ interface Message {
     body: string
 }
 
-async function recommend(_ignored: any, data: RecommenderMessage) {
+export async function recommend(_ignored: any, data: RecommenderMessage) {
     const breed = data.breed;
     const sql_query = `SELECT user_list FROM breed_user_list WHERE breed = "${breed}"`;
 
@@ -81,7 +81,4 @@ async function recommend(_ignored: any, data: RecommenderMessage) {
         console.log('Message has been sent to user ' + user_uuid);
 
     }
-
 }
-
-export default recommend;
