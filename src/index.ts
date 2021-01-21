@@ -28,18 +28,23 @@ export async function recommend(
 
   await connect();
 
-  const interestedUsers: string[] = ((await query(
-    sqlQuery,
-  )) as any)[0].user_list.split(',');
+  const users: string[] = ((await query(sqlQuery)) as any)[0].user_list.split(
+    ',',
+  );
 
-  for (const user of interestedUsers) {
+  for (const user of users) {
     const participants = [recommenderBot.uuid, user];
+
+    console.log(
+      qs.stringify({ participants: participants, strictEqual: true }),
+    );
 
     const chats = (
       await axios.get<Chat[]>(`${chatApiUrl}/chats`, {
         params: qs.stringify(
           {
             participants: participants,
+            strictEqual: true,
           },
           { arrayFormat: 'indices' },
         ),
@@ -49,7 +54,6 @@ export async function recommend(
 
     let chatId: string;
 
-    // TODO strict equal
     if (chats.length > 0) {
       chatId = chats[0].uuid;
     } else {
