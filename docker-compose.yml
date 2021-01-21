@@ -11,3 +11,8 @@ services:
       - 3307:3306
     volumes:
       - ./database:/docker-entrypoint-initdb.d
+  pubsub:
+    image: google/cloud-sdk:emulators
+    ports:
+      - 8085:8085
+    entrypoint: /bin/bash -c "gcloud config set project vet-shelter && /google-cloud-sdk/platform/pubsub-emulator/bin/cloud-pubsub-emulator --host=0.0.0.0 --port=8085"
