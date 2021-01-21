@@ -1,4 +1,4 @@
-version: "3.7"
+version: '3.7'
 
 services:
   db:
@@ -8,6 +8,6 @@ services:
       MYSQL_ROOT_PASSWORD: rootybooty
       MYSQL_DATABASE: wolkesieben_local
     ports:
-      - 3306:3306
+      - 3307:3306
     volumes:
       - ./database:/docker-entrypoint-initdb.d
