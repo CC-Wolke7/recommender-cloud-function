@@ -32,9 +32,7 @@ export async function recommend(
     ',',
   );
 
-  for (let user of users) {
-    user = '7c8a6ec3-fc0f-4e0f-95ac-e25f3500c157';
-
+  for (const user of users) {
     const participants = [recommenderBot.uuid, user];
 
     const chats = (
@@ -73,6 +71,7 @@ export async function recommend(
 
       console.log(`Created new chat between bot and ${user}`);
     }
+    console.log('ChatID: ' + chatId);
 
     await axios.post<Message>(
       `${chatApiUrl}/chat/${chatId}/messages`,
