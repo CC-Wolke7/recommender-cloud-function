@@ -32,22 +32,20 @@ export async function recommend(
     ',',
   );
 
-  for (const user of users) {
-    const participants = [recommenderBot.uuid, user];
+  for (let user of users) {
+    user = '7c8a6ec3-fc0f-4e0f-95ac-e25f3500c157';
 
-    console.log(
-      qs.stringify({ participants: participants, strictEqual: true }),
-    );
+    const participants = [recommenderBot.uuid, user];
 
     const chats = (
       await axios.get<Chat[]>(`${chatApiUrl}/chats`, {
-        params: qs.stringify(
-          {
-            participants: participants,
-            strictEqual: true,
-          },
-          { arrayFormat: 'indices' },
-        ),
+        params: {
+          participants: participants,
+          strictEqual: true,
+        },
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { arrayFormat: 'indices' });
+        },
         headers: { Authorization: `Bearer ${recommenderBot.token}` },
       })
     ).data;
@@ -56,6 +54,8 @@ export async function recommend(
 
     if (chats.length > 0) {
       chatId = chats[0].uuid;
+
+      console.log(`Chat between bot and user ${user} already exists`);
     } else {
       console.log(
         `No chat with bot has been found for user with uuid ${user}. Will now instantiate chat`,
@@ -70,6 +70,8 @@ export async function recommend(
       ).data;
 
       chatId = chat.uuid;
+
+      console.log(`Created new chat between bot and ${user}`);
     }
 
     await axios.post<Message>(
