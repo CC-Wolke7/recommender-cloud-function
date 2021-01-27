@@ -11,7 +11,7 @@ export async function recommend(
 ): Promise<void> {
   const breed = data.breed;
   const { recommenderBot, chatApiUrl, database } = config;
-  const sqlQuery = `SELECT user_list FROM race_user_list WHERE race = "${breed}"`;
+  const sqlQuery = `SELECT user_list FROM breed_user_list WHERE breed = "${breed}"`;
 
   const databaseConnection = createConnection({
     host: database.host,
