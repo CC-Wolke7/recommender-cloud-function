@@ -5,6 +5,7 @@ Dockerfile
 Makefile
 node_modules/
 dist/
+database/*.sql
 coverage/
 *.env*
 *.sh
