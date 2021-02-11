@@ -1,8 +1,6 @@
 import { config } from './config';
-import { createConnection } from 'mysql';
 import * as qs from 'qs';
 import axios from 'axios';
-import { promisify } from 'util';
 import { RecommenderMessage, Chat, Message } from './types';
 
 export async function recommend(
@@ -10,27 +8,19 @@ export async function recommend(
   data: RecommenderMessage,
 ): Promise<void> {
   const breed = data.breed;
-  const { recommenderBot, chatApiUrl, database } = config;
-  const sqlQuery = `SELECT user_list FROM breed_user_list WHERE breed = "${breed}"`;
+  const { recommenderBot, chatApiUrl, appServiceUrl } = config;
 
-  const databaseConnection = createConnection({
-    host: database.host,
-    port: database.port,
-    user: database.user,
-    password: database.password,
-    database: database.name,
-  });
-
-  const connect = promisify(databaseConnection.connect).bind(
-    databaseConnection,
-  );
-  const query = promisify(databaseConnection.query).bind(databaseConnection);
-
-  await connect();
-
-  const users: string[] = ((await query(sqlQuery)) as any)[0].user_list.split(
-    ',',
-  );
+  const users = (
+    await axios.get<string[]>(`${appServiceUrl}`, {
+      params: {
+        breed: breed,
+      },
+      paramsSerializer: (params) => {
+        return qs.stringify(params, { arrayFormat: 'indices' });
+      },
+      headers: { Authorization: `Bearer ${recommenderBot.token}` },
+    })
+  ).data;
 
   for (const user of users) {
     const participants = [recommenderBot.uuid, user];
