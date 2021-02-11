@@ -7,11 +7,7 @@ services:
       context: .
     environment:
       CHAT_API_URL: http://host.docker.internal:3000 # service on your host machine
-      DATABASE_HOST: db
-      DATABASE_PORT: 3306 # use container port due to local bridge
-      DATABASE_USER: root
-      DATABASE_PASSWORD: rootybooty
-      DATABASE_NAME: wolkesieben_local
+      APP_SERVICE_URL: http://host.docker.internal:8000
     volumes:
       - ./src:/app/src
     ports:
@@ -20,17 +16,6 @@ services:
       - db
       - pubsub
     command: npm run watch
-
-  db:
-    image: mysql
-    command: --default-authentication-plugin=mysql_native_password
-    environment:
-      MYSQL_ROOT_PASSWORD: rootybooty
-      MYSQL_DATABASE: wolkesieben_local
-    ports:
-      - 3307:3306
-    volumes:
-      - ./database:/docker-entrypoint-initdb.d
 
   pubsub:
     image: google/cloud-sdk:emulators
