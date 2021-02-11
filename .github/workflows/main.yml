@@ -1,0 +1,57 @@
+name: Deployment
+
+on: [workflow_dispatch]
+
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  SERVICE_NAME: recommender-function
+  TRIGGER_TOPIC: newOffer
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-20.04
+    steps:
+      # https://github.com/marketplace/actions/cancel-workflow-action
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.6.0
+        with:
+          access_token: ${{ env.GITHUB_TOKEN }}
+
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      # https://github.com/google-github-actions/setup-gcloud/
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          service_account_key: ${{ env.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Package
+        run: |
+          rm -rf deploy.tmp
+          mkdir -p deploy.tmp
+
+          cp -r build/*.js deploy.tmp
+          cp package.json deploy.tmp
+
+      # https://github.com/google-github-actions/deploy-cloud-functions
+      - name: Deploy to Google Cloud Functions
+        uses: google-github-actions/deploy-cloud-functions@main
+        with:
+          name: ${{ env.SERVICE_NAME }}
+          runtime: nodejs14
+          region: europe-west3
+          source_dir: deploy.tmp
+          entry_point: recommend
+          event_trigger_type: providers/cloud.pubsub/eventTypes/topic.publish
+          event_trigger_resource: projects/${{ env.GCP_PROJECT_ID }}/topics/${{ env.TRIGGER_TOPIC }}

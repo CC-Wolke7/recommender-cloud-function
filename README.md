@@ -43,7 +43,29 @@ If you prefer not to develop with Docker, you can run the app natively on your s
 2. `$ npm ci`
 3. `$ npm run watch`
 
-## Use in cloud environment
+## Deployment
+
+This project includes a GitHub workflow for deployment to Google Cloud Functions. To do so, perform the following steps:
+
+1. Create a new service account (SA) via: IAM & Admin > Service Accounts > Create Service Account
+
+2. Grant permissions via IAM & Admin > IAM > Permissions > Edit SA (from above) > Add another role
+
+- Service Account User
+- Cloud Functions Admin
+
+3. Generate a service account key via IAM & Admin > Service Accounts > Actions > Create key > type: JSON
+
+4. Add GitHub secrets
+
+- `GCP_PROJECT_ID: <your-project>`
+- `GCP_SA_KEY: <JSON-contents-from-above>`
+
+5. Enable the [Google Cloud Functions API](http://console.cloud.google.com/apis/library/cloudfunctions.googleapis.com)
+
+6. Deploy via GitHub Actions
+
+<!-- ## Use in cloud environment
 
 #### Create view in MySQL DB
 
@@ -59,4 +81,4 @@ If you prefer not to develop with Docker, you can run the app natively on your s
 
 #### App Microservice publishes
 
-`gcloud pubsub topics publish <topic> --message '{ "race": "golden_retriever" }'`
+`gcloud pubsub topics publish <topic> --message '{ "race": "golden_retriever" }'` -->

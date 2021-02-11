@@ -8,7 +8,8 @@
     "start": "functions-framework --source=build/ --target=recommend --signature-type=event",
     "watch": "concurrently \"tsc -p tsconfig.json -w\" \"nodemon --watch ./build/ --exec npm run start\"",
     "fix:lint": "eslint --fix '{src,test}/**/*.ts'",
-    "fix:format": "prettier --write ."
+    "fix:format": "prettier --write .",
+    "gcp-build": "npm run build"
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^1.7.1",
