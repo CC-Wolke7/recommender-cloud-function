@@ -1,6 +1,19 @@
 # Recommender Cloud Function
 
-You can send a test message via: `$ curl -d "@message.json" -X POST -H "Content-Type: application/json" http://localhost:8080`
+You can send a test message via:
+
+```bash
+curl -d "@mockPubSub.json" \
+  -X POST \
+  -H "Ce-Type: true" \
+  -H "Ce-Specversion: true" \
+  -H "Ce-Source: true" \
+  -H "Ce-Id: true" \
+  -H "Content-Type: application/json" \
+  http://localhost:8080
+```
+
+The [`functions-framework-nodejs`]() project acknowledges that there are a [couple](https://github.com/GoogleCloudPlatform/functions-framework-nodejs/issues/41) of [issues](https://github.com/GoogleCloudPlatform/functions-framework-nodejs/issues/96) regarding serialization of local test event. Be sure to test and adapt the payload format for production.
 
 ## Development
 
