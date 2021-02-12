@@ -11,7 +11,7 @@ export async function recommend(
   const { recommenderBot, chatApiUrl, appServiceUrl } = config;
 
   const users = (
-    await axios.get<string[]>(`${appServiceUrl}/breed`, {
+    await axios.get<string[]>(`${appServiceUrl}breed`, {
       params: {
         breed: breed,
       },
@@ -26,7 +26,7 @@ export async function recommend(
     const participants = [recommenderBot.uuid, user];
 
     const chats = (
-      await axios.get<Chat[]>(`${chatApiUrl}/chats`, {
+      await axios.get<Chat[]>(`${chatApiUrl}chats`, {
         params: {
           participants: participants,
           strictEqual: true,
@@ -51,7 +51,7 @@ export async function recommend(
 
       const chat = (
         await axios.post<Chat>(
-          `${chatApiUrl}/chats/`,
+          `${chatApiUrl}chats/`,
           { participants: participants },
           { headers: { Authorization: `Bearer ${recommenderBot.token}` } },
         )
@@ -64,7 +64,7 @@ export async function recommend(
     console.log('ChatID: ' + chatId);
 
     await axios.post<Message>(
-      `${chatApiUrl}/chat/${chatId}/messages`,
+      `${chatApiUrl}chat/${chatId}/messages`,
       { message: `See this cute new ${breed}` },
       {
         headers: { Authorization: `Bearer ${recommenderBot.token}` },
