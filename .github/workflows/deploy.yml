@@ -54,5 +54,5 @@ jobs:
           region: europe-west3
           source_dir: deploy.tmp
           entry_point: recommend
-          event_trigger_type: providers/cloud.pubsub/eventTypes/topic.publish
+          event_trigger_type: google.pubsub.topic.publish
           event_trigger_resource: projects/${{ env.GCP_PROJECT_ID }}/topics/${{ env.TRIGGER_TOPIC }}
