@@ -8,7 +8,7 @@ export async function recommend(
   data: RecommenderMessage,
 ): Promise<void> {
   const breed = data.breed;
-  const { recommenderBot, chatApiUrl_, appServiceUrl_ } = config;
+  const { recommenderBot } = config;
 
   const appServiceUrl = 'https://app-api-xm7n7eaepa-ey.a.run.app/';
   const chatApiUrl = 'https://chat-api-xm7n7eaepa-ey.a.run.app/';
