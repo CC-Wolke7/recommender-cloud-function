@@ -6,8 +6,8 @@ services:
     build:
       context: .
     environment:
-      CHAT_API_URL: https://chat-api-xm7n7eaepa-ey.a.run.app/ # http://host.docker.internal:3000 # service on your host machine
-      APP_SERVICE_URL: https://app-api-xm7n7eaepa-ey.a.run.app/ # http://host.docker.internal:8000
+      CHAT_API_URL: http://host.docker.internal:3000 # service on your host machine
+      APP_SERVICE_URL: http://host.docker.internal:8000
     volumes:
       - ./src:/app/src
     ports:
