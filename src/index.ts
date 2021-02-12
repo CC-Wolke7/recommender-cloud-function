@@ -11,14 +11,14 @@ export async function recommend(
   const { recommenderBot, chatApiUrl, appServiceUrl } = config;
 
   const users = (
-    await axios.get<string[]>(`${appServiceUrl}`, {
+    await axios.get<string[]>(`${appServiceUrl}/breed`, {
       params: {
         breed: breed,
       },
       paramsSerializer: (params) => {
         return qs.stringify(params, { arrayFormat: 'indices' });
       },
-      headers: { Authorization: `Bearer ${recommenderBot.token}` },
+      headers: { Authorization: `${recommenderBot.token}` },
     })
   ).data;
 
