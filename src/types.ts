@@ -1,5 +1,6 @@
 export interface RecommenderMessage {
   breed: string;
+  offerUrl?: string;
 }
 
 export interface Chat {

@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "functions-framework --source=build/ --target=recommend --signature-type=event",
+    "start": "functions-framework --source=build --target=recommend --signature-type=event",
     "watch": "concurrently \"tsc -p tsconfig.json -w\" \"nodemon --watch ./build/ --exec npm run start\"",
     "fix:lint": "eslint --fix '{src,test}/**/*.ts'",
     "fix:format": "prettier --write ."

@@ -5,25 +5,29 @@ import { RecommenderMessage, Chat, Message } from './types';
 import { EventFunction } from '@google-cloud/functions-framework/build/src/functions';
 
 export const recommend: EventFunction = async (data, context) => {
-  const recommenderMessage = data as RecommenderMessage;
-  const breed = recommenderMessage.breed;
+  const eventPayload = data as RecommenderMessage;
 
-  const { recommenderBot, appServiceUrl, chatApiUrl } = config;
+  const breed = eventPayload.breed;
+  const offerUrl = eventPayload.offerUrl;
+
+  if (!breed) {
+    console.log("Invalid 'newOffer' event payload");
+    return;
+  }
+
+  const { recommenderBot, appServiceUrl, chatServiceUrl } = config;
 
   const users = (
-    await axios.get<string[]>(`${appServiceUrl}breed`, {
+    await axios.get<string[]>(`${appServiceUrl}/breed`, {
       params: {
         breed: breed,
-      },
-      paramsSerializer: (params) => {
-        return qs.stringify(params, { arrayFormat: 'indices' });
       },
       headers: { Authorization: `${recommenderBot.token}` },
     })
   ).data;
 
   if (users.length === 0) {
-    console.log('No users found.');
+    console.log(`No users interested in offers for breed '${breed}'`);
     return;
   }
 
@@ -31,7 +35,7 @@ export const recommend: EventFunction = async (data, context) => {
     const participants = [recommenderBot.uuid, user];
 
     const chats = (
-      await axios.get<Chat[]>(`${chatApiUrl}chats`, {
+      await axios.get<Chat[]>(`${chatServiceUrl}/chats`, {
         params: {
           participants: participants,
           strictEqual: true,
@@ -48,15 +52,17 @@ export const recommend: EventFunction = async (data, context) => {
     if (chats.length > 0) {
       chatId = chats[0].uuid;
 
-      console.log(`Chat between bot and user ${user} already exists`);
+      console.log(
+        `Chat between recommender bot and user '${user}' already exists`,
+      );
     } else {
       console.log(
-        `No chat with bot has been found for user with uuid ${user}. Will now instantiate chat`,
+        `No chat between recommender bot and user '${user}' found. Creating...`,
       );
 
       const chat = (
         await axios.post<Chat>(
-          `${chatApiUrl}chats/`,
+          `${chatServiceUrl}/chats/`,
           { participants: participants },
           { headers: { Authorization: `Bearer ${recommenderBot.token}` } },
         )
@@ -64,18 +70,23 @@ export const recommend: EventFunction = async (data, context) => {
 
       chatId = chat.uuid;
 
-      console.log(`Created new chat between bot and ${user}`);
+      console.log(
+        `Created new chat between recommender bot and user '${user}'`,
+      );
     }
-    console.log('ChatID: ' + chatId);
+
+    console.log(
+      `Sending an offer recommendation message to chat '${chatId}'...`,
+    );
 
     await axios.post<Message>(
-      `${chatApiUrl}chat/${chatId}/messages`,
-      { message: `See this cute new ${breed}` },
+      `${chatServiceUrl}/chat/${chatId}/messages`,
+      { message: `Checkout this cute ${breed} at ${offerUrl}` },
       {
         headers: { Authorization: `Bearer ${recommenderBot.token}` },
       },
     );
 
-    console.log(`Message has been sent to user ${user}`);
+    console.log(`Sent offer recommendation message to user '${user}'`);
   }
 };
