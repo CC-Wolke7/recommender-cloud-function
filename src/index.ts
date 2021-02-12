@@ -2,81 +2,80 @@ import { config } from './config';
 import * as qs from 'qs';
 import axios from 'axios';
 import { RecommenderMessage, Chat, Message } from './types';
+import { EventFunction } from '@google-cloud/functions-framework/build/src/functions';
 
-export async function recommend(
-  _: any,
-  data: RecommenderMessage,
-): Promise<void> {
-  const breed = data.breed;
+export const recommend: EventFunction = async (data, context) => {
+  const recommenderMessage = data as RecommenderMessage;
+  const breed = recommenderMessage.breed;
+
   const { recommenderBot, appServiceUrl, chatApiUrl } = config;
 
-  console.log(config);
+  const users = (
+    await axios.get<string[]>(`${appServiceUrl}breed`, {
+      params: {
+        breed: breed,
+      },
+      paramsSerializer: (params) => {
+        return qs.stringify(params, { arrayFormat: 'indices' });
+      },
+      headers: { Authorization: `${recommenderBot.token}` },
+    })
+  ).data;
 
-  try {
-    const users = (
-      await axios.get<string[]>(`${appServiceUrl}breed`, {
+  if (users.length === 0) {
+    console.log('No users found.');
+    return;
+  }
+
+  for (const user of users) {
+    const participants = [recommenderBot.uuid, user];
+
+    const chats = (
+      await axios.get<Chat[]>(`${chatApiUrl}chats`, {
         params: {
-          breed: breed,
+          participants: participants,
+          strictEqual: true,
         },
         paramsSerializer: (params) => {
           return qs.stringify(params, { arrayFormat: 'indices' });
         },
-        headers: { Authorization: `${recommenderBot.token}` },
+        headers: { Authorization: `Bearer ${recommenderBot.token}` },
       })
     ).data;
 
-    for (const user of users) {
-      const participants = [recommenderBot.uuid, user];
+    let chatId: string;
 
-      const chats = (
-        await axios.get<Chat[]>(`${chatApiUrl}chats`, {
-          params: {
-            participants: participants,
-            strictEqual: true,
-          },
-          paramsSerializer: (params) => {
-            return qs.stringify(params, { arrayFormat: 'indices' });
-          },
-          headers: { Authorization: `Bearer ${recommenderBot.token}` },
-        })
-      ).data;
+    if (chats.length > 0) {
+      chatId = chats[0].uuid;
 
-      let chatId: string;
-
-      if (chats.length > 0) {
-        chatId = chats[0].uuid;
-
-        console.log(`Chat between bot and user ${user} already exists`);
-      } else {
-        console.log(
-          `No chat with bot has been found for user with uuid ${user}. Will now instantiate chat`,
-        );
-
-        const chat = (
-          await axios.post<Chat>(
-            `${chatApiUrl}chats/`,
-            { participants: participants },
-            { headers: { Authorization: `Bearer ${recommenderBot.token}` } },
-          )
-        ).data;
-
-        chatId = chat.uuid;
-
-        console.log(`Created new chat between bot and ${user}`);
-      }
-      console.log('ChatID: ' + chatId);
-
-      await axios.post<Message>(
-        `${chatApiUrl}chat/${chatId}/messages`,
-        { message: `See this cute new ${breed}` },
-        {
-          headers: { Authorization: `Bearer ${recommenderBot.token}` },
-        },
+      console.log(`Chat between bot and user ${user} already exists`);
+    } else {
+      console.log(
+        `No chat with bot has been found for user with uuid ${user}. Will now instantiate chat`,
       );
 
-      console.log(`Message has been sent to user ${user}`);
+      const chat = (
+        await axios.post<Chat>(
+          `${chatApiUrl}chats/`,
+          { participants: participants },
+          { headers: { Authorization: `Bearer ${recommenderBot.token}` } },
+        )
+      ).data;
+
+      chatId = chat.uuid;
+
+      console.log(`Created new chat between bot and ${user}`);
     }
-  } catch (error) {
-    console.log(error);
+    console.log('ChatID: ' + chatId);
+
+    await axios.post<Message>(
+      `${chatApiUrl}chat/${chatId}/messages`,
+      { message: `See this cute new ${breed}` },
+      {
+        headers: { Authorization: `Bearer ${recommenderBot.token}` },
+      },
+    );
+
+    console.log(`Message has been sent to user ${user}`);
   }
-}
+};
