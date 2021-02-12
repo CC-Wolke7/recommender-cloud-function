@@ -12,67 +12,72 @@ export async function recommend(
 
   const appServiceUrl = 'https://app-api-xm7n7eaepa-ey.a.run.app/';
   const chatApiUrl = 'https://chat-api-xm7n7eaepa-ey.a.run.app/';
-  const users = (
-    await axios.get<string[]>(`${appServiceUrl}breed`, {
-      params: {
-        breed: breed,
-      },
-      paramsSerializer: (params) => {
-        return qs.stringify(params, { arrayFormat: 'indices' });
-      },
-      headers: { Authorization: `${recommenderBot.token}` },
-    })
-  ).data;
 
-  for (const user of users) {
-    const participants = [recommenderBot.uuid, user];
-
-    const chats = (
-      await axios.get<Chat[]>(`${chatApiUrl}chats`, {
+  try {
+    const users = (
+      await axios.get<string[]>(`${appServiceUrl}breed`, {
         params: {
-          participants: participants,
-          strictEqual: true,
+          breed: breed,
         },
         paramsSerializer: (params) => {
           return qs.stringify(params, { arrayFormat: 'indices' });
         },
-        headers: { Authorization: `Bearer ${recommenderBot.token}` },
+        headers: { Authorization: `${recommenderBot.token}` },
       })
     ).data;
 
-    let chatId: string;
+    for (const user of users) {
+      const participants = [recommenderBot.uuid, user];
 
-    if (chats.length > 0) {
-      chatId = chats[0].uuid;
-
-      console.log(`Chat between bot and user ${user} already exists`);
-    } else {
-      console.log(
-        `No chat with bot has been found for user with uuid ${user}. Will now instantiate chat`,
-      );
-
-      const chat = (
-        await axios.post<Chat>(
-          `${chatApiUrl}chats/`,
-          { participants: participants },
-          { headers: { Authorization: `Bearer ${recommenderBot.token}` } },
-        )
+      const chats = (
+        await axios.get<Chat[]>(`${chatApiUrl}chats`, {
+          params: {
+            participants: participants,
+            strictEqual: true,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { arrayFormat: 'indices' });
+          },
+          headers: { Authorization: `Bearer ${recommenderBot.token}` },
+        })
       ).data;
 
-      chatId = chat.uuid;
+      let chatId: string;
 
-      console.log(`Created new chat between bot and ${user}`);
+      if (chats.length > 0) {
+        chatId = chats[0].uuid;
+
+        console.log(`Chat between bot and user ${user} already exists`);
+      } else {
+        console.log(
+          `No chat with bot has been found for user with uuid ${user}. Will now instantiate chat`,
+        );
+
+        const chat = (
+          await axios.post<Chat>(
+            `${chatApiUrl}chats/`,
+            { participants: participants },
+            { headers: { Authorization: `Bearer ${recommenderBot.token}` } },
+          )
+        ).data;
+
+        chatId = chat.uuid;
+
+        console.log(`Created new chat between bot and ${user}`);
+      }
+      console.log('ChatID: ' + chatId);
+
+      await axios.post<Message>(
+        `${chatApiUrl}chat/${chatId}/messages`,
+        { message: `See this cute new ${breed}` },
+        {
+          headers: { Authorization: `Bearer ${recommenderBot.token}` },
+        },
+      );
+
+      console.log(`Message has been sent to user ${user}`);
     }
-    console.log('ChatID: ' + chatId);
-
-    await axios.post<Message>(
-      `${chatApiUrl}chat/${chatId}/messages`,
-      { message: `See this cute new ${breed}` },
-      {
-        headers: { Authorization: `Bearer ${recommenderBot.token}` },
-      },
-    );
-
-    console.log(`Message has been sent to user ${user}`);
+  } catch (error) {
+    console.log(error);
   }
 }
