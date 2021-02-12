@@ -10,6 +10,8 @@ export async function recommend(
   const breed = data.breed;
   const { recommenderBot, appServiceUrl, chatApiUrl } = config;
 
+  console.log(config);
+
   try {
     const users = (
       await axios.get<string[]>(`${appServiceUrl}breed`, {
