@@ -9,17 +9,9 @@ services:
       RECOMMENDER_BOT_TOKEN: NTZiYWU4YjE1ZmQyYzdlMGViZDI1Y2EzODMzZTUxZjQK
       RECOMMENDER_BOT_USER_UUID: 5a994e8e-7dbe-4a61-9a21-b0f45d1bffbd
       APP_SERVICE_URL: http://host.docker.internal:8000
-      CHAT_SERVICE_URL: http://host.docker.internal:3000 # service on your host machine
+      CHAT_SERVICE_URL: http://host.docker.internal:3000
     volumes:
       - ./src:/app/src
     ports:
       - 8080:8080
-    # depends_on:
-    #   - pubsub
     command: npm run watch
-  #
-  # pubsub:
-  #   image: google/cloud-sdk:emulators
-  #   ports:
-  #     - 8085:8085
-  #   entrypoint: /bin/bash -c "gcloud config set project vet-shelter && /google-cloud-sdk/platform/pubsub-emulator/bin/cloud-pubsub-emulator --host=0.0.0.0 --port=8085"
