@@ -16,6 +16,7 @@ export const recommend: EventFunction = async (data, context) => {
   }
 
   const { recommenderBot, appServiceUrl, chatServiceUrl } = config;
+  console.log(appServiceUrl);
 
   const users = (
     await axios.get<string[]>(`${appServiceUrl}/breed`, {
@@ -25,6 +26,8 @@ export const recommend: EventFunction = async (data, context) => {
       headers: { Authorization: `${recommenderBot.token}` },
     })
   ).data;
+
+  console.log(users);
 
   if (users.length === 0) {
     console.log(`No users interested in offers for breed '${breed}'`);
