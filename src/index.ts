@@ -7,6 +7,8 @@ import { EventFunction } from '@google-cloud/functions-framework/build/src/funct
 export const recommend: EventFunction = async (data, context) => {
   const eventPayload = data as RecommenderMessage;
 
+  console.log(eventPayload);
+
   const breed = eventPayload.breed;
   const offerUrl = eventPayload.offerUrl;
 
