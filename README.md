@@ -1,6 +1,8 @@
 # Recommender Cloud Function
 
-You can send a test message via:
+[![Deployment](https://github.com/cc-wolke7/recommender-cloud-function/workflows/Deployment/badge.svg)](https://github.com/CC-Wolke7/recommender-cloud-function/actions?query=workflow%3ADeployment)
+
+You can send a test event via:
 
 ```bash
 curl -d "@mockPubSub.json" \
@@ -13,7 +15,7 @@ curl -d "@mockPubSub.json" \
   http://localhost:8080
 ```
 
-The [`functions-framework-nodejs`]() project acknowledges that there are a [couple](https://github.com/GoogleCloudPlatform/functions-framework-nodejs/issues/41) of [issues](https://github.com/GoogleCloudPlatform/functions-framework-nodejs/issues/96) regarding serialization of local test event. Be sure to test and adapt the payload format for production.
+The [`functions-framework-nodejs`]() project acknowledges that there are a [couple](https://github.com/GoogleCloudPlatform/functions-framework-nodejs/issues/41) of [issues](https://github.com/GoogleCloudPlatform/functions-framework-nodejs/issues/96) regarding the serialization of local test events. Be sure to test and adapt the payload format for production.
 
 ## Development
 
@@ -42,19 +44,11 @@ If you prefer not to develop with Docker, you can run the app natively on your s
 #### Dependencies:
 
 - [NodeJS 14.15+](https://www.python.org/)
-- MySQL
-- [Google Cloud SDK](https://cloud.google.com/sdk/docs/quickstart?hl=de)
 
 #### Steps:
 
-1. Setup the database
-
-- Create the MySQL DB using the `database/testdump.sql`
-- Update the DB connection infos in `index.ts`
-
-1. Emulate Google PubSub via: `$ gcloud beta emulators pubsub start`
-2. `$ npm ci`
-3. `$ npm run watch`
+1. `$ npm ci`
+2. `$ npm run watch`
 
 ## Deployment
 
@@ -77,21 +71,3 @@ This project includes a GitHub workflow for deployment to Google Cloud Functions
 5. Enable the [Google Cloud Functions API](http://console.cloud.google.com/apis/library/cloudfunctions.googleapis.com)
 
 6. Deploy via GitHub Actions
-
-<!-- ## Use in cloud environment
-
-#### Create view in MySQL DB
-
-`` CREATE VIEW `race_user_list` AS SELECT race, GROUP_CONCAT(user_id) FROM subscription GROUP BY race ``
-
-#### Create a Pub/Sub topic
-
-`gcloud pubsub topics create <topic>`
-
-#### Deploy recommend function and set trigger topic
-
-`gcloud functions deploy MY_FUNCTION --trigger-topic <topic> --runtime nodejs10`
-
-#### App Microservice publishes
-
-`gcloud pubsub topics publish <topic> --message '{ "race": "golden_retriever" }'` -->
