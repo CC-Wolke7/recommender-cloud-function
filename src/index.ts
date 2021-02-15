@@ -5,12 +5,15 @@ import { RecommenderMessage, Chat, Message } from './types';
 import { EventFunction } from '@google-cloud/functions-framework/build/src/functions';
 
 export const recommend: EventFunction = async (data, context) => {
-  const eventPayload = data as RecommenderMessage;
+  console.log(data);
+  console.log(atob(data as string));
 
-  console.log(eventPayload);
+  //const eventPayload = data as RecommenderMessage;
 
-  const breed = eventPayload.breed;
-  const offerUrl = eventPayload.offerUrl;
+  // console.log({eventPayload: eventPayload});
+
+  const breed = 'Jack Russel'; //eventPayload.breed;
+  const offerUrl = 'test'; //eventPayload.offerUrl;
 
   if (!breed) {
     console.log("Invalid 'newOffer' event payload");
