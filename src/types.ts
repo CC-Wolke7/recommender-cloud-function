@@ -1,8 +1,3 @@
-export interface RecommenderMessage {
-  breed: string;
-  offerUrl?: string;
-}
-
 export interface Chat {
   uuid: string;
   creator: string;
@@ -15,4 +10,9 @@ export interface Message {
   sender: string;
   date: string;
   body: string;
+}
+
+export interface EventPayloadObject {
+  attributes: any;
+  data: string;
 }

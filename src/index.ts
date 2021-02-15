@@ -1,32 +1,39 @@
 import { config } from './config';
 import * as qs from 'qs';
 import axios from 'axios';
-import { RecommenderMessage, Chat, Message } from './types';
+import { Chat, Message, EventPayloadObject } from './types';
 import { EventFunction } from '@google-cloud/functions-framework/build/src/functions';
 
 export const recommend: EventFunction = async (data, context) => {
-  console.log(data);
-  console.log(atob(data as string));
+  const eventPayload = data as EventPayloadObject;
+  const recommend_data = JSON.parse(
+    Buffer.from(eventPayload.data, 'base64').toString(),
+  );
 
-  //const eventPayload = data as RecommenderMessage;
-
-  // console.log({eventPayload: eventPayload});
-
-  const breed = 'Jack Russel'; //eventPayload.breed;
-  const offerUrl = 'test'; //eventPayload.offerUrl;
+  const breed = recommend_data.breed;
+  const offerUrl = recommend_data.offerUrl;
 
   if (!breed) {
     console.log("Invalid 'newOffer' event payload");
     return;
   }
 
+  console.log(recommend_data);
+
   const { recommenderBot, appServiceUrl, chatServiceUrl } = config;
   console.log(appServiceUrl);
+  console.log(chatServiceUrl);
+  console.log(recommenderBot);
+
+  console.log(qs.stringify({ breed: breed }, { arrayFormat: 'indices' }));
 
   const users = (
-    await axios.get<string[]>(`${appServiceUrl}/breed`, {
+    await axios.get<string[]>(`${appServiceUrl}/subscribers?`, {
       params: {
         breed: breed,
+      },
+      paramsSerializer: (params) => {
+        return qs.stringify(params, { arrayFormat: 'indices' });
       },
       headers: { Authorization: `${recommenderBot.token}` },
     })
@@ -38,6 +45,8 @@ export const recommend: EventFunction = async (data, context) => {
     console.log(`No users interested in offers for breed '${breed}'`);
     return;
   }
+
+  console.log(chatServiceUrl);
 
   for (const user of users) {
     const participants = [recommenderBot.uuid, user];
@@ -68,9 +77,11 @@ export const recommend: EventFunction = async (data, context) => {
         `No chat between recommender bot and user '${user}' found. Creating...`,
       );
 
+      console.log(recommenderBot.token);
+
       const chat = (
         await axios.post<Chat>(
-          `${chatServiceUrl}/chats/`,
+          `${chatServiceUrl}/chats`,
           { participants: participants },
           { headers: { Authorization: `Bearer ${recommenderBot.token}` } },
         )
@@ -89,7 +100,7 @@ export const recommend: EventFunction = async (data, context) => {
 
     await axios.post<Message>(
       `${chatServiceUrl}/chat/${chatId}/messages`,
-      { message: `Checkout this cute ${breed} at ${offerUrl}` },
+      { message: `Checkout this cute ${breed} at ${offerUrl}!` },
       {
         headers: { Authorization: `Bearer ${recommenderBot.token}` },
       },
