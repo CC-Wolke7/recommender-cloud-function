@@ -17,13 +17,10 @@ export const recommend: EventFunction = async (data, context) => {
   ) as Offer;
   console.log({ offer });
 
-  const breed = offer.breed;
-  const offerUrl = `${appServiceUrl}/offer/${offer.uuid}`;
-
   const users = (
     await axios.get<string[]>(`${appServiceUrl}/subscribers?`, {
       params: {
-        breed: breed,
+        breed: offer.breed,
       },
       paramsSerializer: (params) => {
         return qs.stringify(params, { arrayFormat: 'indices' });
@@ -33,7 +30,7 @@ export const recommend: EventFunction = async (data, context) => {
   ).data;
 
   if (users.length === 0) {
-    console.log(`No users interested in offers for breed '${breed}'`);
+    console.log(`No users interested in offers for breed '${offer.breed}'`);
     return;
   } else {
     console.log(`Found ${users.length} interester users: ${users}`);
@@ -83,13 +80,16 @@ export const recommend: EventFunction = async (data, context) => {
       );
     }
 
+    const offerUrl = `${appServiceUrl}/#/offer/${offer.uuid}`;
+    const message = `Checkout this cute ${offer.breed} at:\n\n${offerUrl}`;
+
     console.log(
       `Sending an offer recommendation message to chat '${chatId}'...`,
     );
 
     await axios.post<Message>(
       `${chatServiceUrl}/chat/${chatId}/messages`,
-      { message: `Checkout this cute ${breed} at ${offerUrl}!` },
+      { message },
       {
         headers: { Authorization: `Bearer ${recommenderBot.token}` },
       },
