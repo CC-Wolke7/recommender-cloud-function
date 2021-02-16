@@ -8,6 +8,7 @@ services:
     environment:
       RECOMMENDER_BOT_TOKEN: NTZiYWU4YjE1ZmQyYzdlMGViZDI1Y2EzODMzZTUxZjQK
       RECOMMENDER_BOT_USER_UUID: 5a994e8e-7dbe-4a61-9a21-b0f45d1bffbd
+      APP_FRONTEND_URL: http://host.docker.internal:8100
       APP_SERVICE_URL: http://host.docker.internal:8000
       CHAT_SERVICE_URL: http://host.docker.internal:3000
     volumes:
