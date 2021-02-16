@@ -12,7 +12,21 @@ export interface Message {
   body: string;
 }
 
-export interface EventPayloadObject {
+export interface Offer {
+  uuid: string;
+  name: string;
+  age: number;
+  species: string;
+  breed: string;
+  sex: string;
+  sterile: boolean;
+  description: string;
+  date_published: string;
+  location?: string;
+  published_by: string;
+}
+
+export interface Event {
   attributes: any;
   data: string;
 }

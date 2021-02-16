@@ -1,31 +1,24 @@
 import { config } from './config';
 import * as qs from 'qs';
 import axios from 'axios';
-import { Chat, Message, EventPayloadObject } from './types';
+import { Chat, Message, Event, Offer } from './types';
 import { EventFunction } from '@google-cloud/functions-framework/build/src/functions';
 
 export const recommend: EventFunction = async (data, context) => {
-  const eventPayload = data as EventPayloadObject;
-  const recommend_data = JSON.parse(
-    Buffer.from(eventPayload.data, 'base64').toString(),
-  );
-
-  const breed = recommend_data.breed;
-  const offerUrl = recommend_data.offerUrl;
-
-  if (!breed) {
-    console.log("Invalid 'newOffer' event payload");
-    return;
-  }
-
-  console.log(recommend_data);
-
   const { recommenderBot, appServiceUrl, chatServiceUrl } = config;
-  console.log(appServiceUrl);
-  console.log(chatServiceUrl);
-  console.log(recommenderBot);
+  console.log({ config });
 
-  console.log(qs.stringify({ breed: breed }, { arrayFormat: 'indices' }));
+  const event = data as Event;
+  console.log({ event });
+  console.log({ context });
+
+  const offer = JSON.parse(
+    Buffer.from(event.data, 'base64').toString(),
+  ) as Offer;
+  console.log({ offer });
+
+  const breed = offer.breed;
+  const offerUrl = `${appServiceUrl}/offer/${offer.uuid}`;
 
   const users = (
     await axios.get<string[]>(`${appServiceUrl}/subscribers?`, {
@@ -39,14 +32,12 @@ export const recommend: EventFunction = async (data, context) => {
     })
   ).data;
 
-  console.log(users);
-
   if (users.length === 0) {
     console.log(`No users interested in offers for breed '${breed}'`);
     return;
+  } else {
+    console.log(`Found ${users.length} interester users: ${users}`);
   }
-
-  console.log(chatServiceUrl);
 
   for (const user of users) {
     const participants = [recommenderBot.uuid, user];
@@ -76,8 +67,6 @@ export const recommend: EventFunction = async (data, context) => {
       console.log(
         `No chat between recommender bot and user '${user}' found. Creating...`,
       );
-
-      console.log(recommenderBot.token);
 
       const chat = (
         await axios.post<Chat>(
