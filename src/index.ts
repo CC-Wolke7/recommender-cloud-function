@@ -5,7 +5,12 @@ import { Chat, Message, Event, Offer } from './types';
 import { EventFunction } from '@google-cloud/functions-framework/build/src/functions';
 
 export const recommend: EventFunction = async (data, context) => {
-  const { recommenderBot, appServiceUrl, chatServiceUrl } = config;
+  const {
+    recommenderBot,
+    appFrontendUrl,
+    appServiceUrl,
+    chatServiceUrl,
+  } = config;
   console.log({ config });
 
   const event = data as Event;
@@ -80,7 +85,7 @@ export const recommend: EventFunction = async (data, context) => {
       );
     }
 
-    const offerUrl = `${appServiceUrl}/#/offer/${offer.uuid}`;
+    const offerUrl = `${appFrontendUrl}/#/offer/${offer.uuid}`;
     const message = `Checkout this cute ${offer.breed} at:\n\n${offerUrl}`;
 
     console.log(
